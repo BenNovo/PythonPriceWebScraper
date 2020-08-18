@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<link href = "style.css" rel = "stylesheet" type = "text/css" />
+    <link rel="absolute-URI" type="application/json" href="static/language-codes.json">
+	<title>Ecommerce Price Webscraper</title>
+</head>
+<body>		
+	<ul>
+		<li><a class = "logoInBar" href = "Scraper.html"><img class = "logo" src = "Scrape.png"></img></a></li>
+  		<li><a href="AboutScraper.html"><p  class = "logo">About</p></a></li>
+	</ul>
+	
+	</br>
+	</br>
+	
+	<form onsubmit="return false;" method="post" name="myForm">
+		<label>Product Name</label>
+		<input type="text" name="name" id="name" />
+		<label>Product Model Number</label>
+		<input type="text" name="model" id="model" />
+		<input type="submit" name="submit" onclick="process()" />
+	</form>
+	
+	
+	</br>
+	</br>
+	
+	
+  	<table>
+		<thead>
+			<tr>
+				<th colspan="2">Products</th>
+			</tr>
+		</thead>
+		<tbody>
+	  </tbody>
+	</table>
+	<script>
+		async function getData() {
+			let data = "";
+			var productName = document.getElementById("name").value;
+			var model = document.getElementById("model").value;
+			var input = {"Product" : productName, "Model" : model};
+			console.log(model);
+			promise = await fetch("/executables/PriceScraper.py", {
+				method : "POST",
+				headers : {'Content-Type' : 'text/html'},
+				body : JSON.stringify(input)
+			}).then(function(response) 
+			{ 
+				console.log(response);
+				return response.text(); 
+			})
+			.then(function(d) { 
+				var el = document.createElement('html');
+				el.innerHTML = d;
+				data = el.getElementsByTagName("BODY")[0].innerText;
+			});
+			return data;
+		}
+    	async function process(){
+    		let name = document.getElementById("name").value;
+    		data = await getData();
+    		console.log(data);
+    		let logger = (key, value) => console.log(`${key} : ${value}`);
+    		const x = JSON.parse(data);
+    		console.log(x);
+    		table = document.getElementsByTagName("TBODY")[0];
+			for(var key in x){
+				row = document.createElement("tr");
+				col1 = document.createElement("td");
+				col2 = document.createElement("td");
+				table.appendChild(row);
+				row.appendChild(col1);
+				row.appendChild(col2);
+				col1.innerHTML = name
+				var i;
+				var s = "";
+				for (i = 0; i < x[key].length; i++){
+					k = Object.keys(x[key][i])[0]
+					s +=  k + " " + x[key][i][k] + "<br>";
+				}	
+				col2.innerHTML = s;
+			}
+    	}
+	</script>
+</body>
+</html>
+
